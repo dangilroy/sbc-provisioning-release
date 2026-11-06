@@ -15,7 +15,7 @@ This repository holds only the install files (`install.sh`, `docker-compose.yml`
 - A Linux server running **Ubuntu 22.04 / 24.04 or Debian 12**, with root access (sudo).
 - HTTPS (port 443) from the server to the management interface of every SBC you'll add.
 - A DNS name for the server that users will browse to (e.g. `sbc-provisioning.example.internal`).
-- A **GitHub classic personal access token** with only the `read:packages` scope, from an account that has been given access to the image. Fine-grained tokens don't work with `ghcr.io`.
+- The **GitHub username and `read:packages` token** for pulling the image. Both are stored in **Bitwarden**. (If you ever need to replace the token: it must be a *classic* personal access token with only the `read:packages` scope. Fine-grained tokens don't work with `ghcr.io`.)
 - An AudioCodes **Administrator** account on both SBCs of each pair you'll add.
 
 Docker Engine and the Compose plugin are installed automatically if they're missing.
@@ -32,7 +32,7 @@ The installer asks for:
 2. **TLS**:
    - `internal`: Caddy issues its own certificate. Browsers warn until Caddy's root CA is trusted.
    - `supplied`: use your own certificate. Put `cert.pem` and `key.pem` in `/opt/sbc-provisioning/certs/` (full chain in `cert.pem`).
-3. **GitHub username and `read:packages` token**, to pull the image.
+3. **GitHub username and `read:packages` token**, to pull the image. Copy both from Bitwarden.
 
 It then generates the secrets, starts the containers and prints a **first-time setup code** such as `ABCD-EFGH-JKLM`. Keep it handy for the next step.
 
@@ -67,6 +67,8 @@ Backups contain `APP_SECRET_KEY` and the database password. Store them somewhere
 ```bash
 gunzip -c db.sql.gz | docker compose -f /opt/sbc-provisioning/docker-compose.yml exec -T db psql -U sbcprov -d sbcprov
 ```
+
+If the token stops working (for example, it has expired), `update` asks for a new one. Get the current token from Bitwarden.
 
 If the install stops part-way (for example, the registry token is rejected), fix the problem and run `sudo /opt/sbc-provisioning/install.sh` again. It resumes with the settings already entered.
 
